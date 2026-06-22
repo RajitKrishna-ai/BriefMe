@@ -1,0 +1,8 @@
+venv/
+venv_new/
+.env
+__pycache__/
+*.pyc
+sample_chat.txt
+*.txt
+*.zip
