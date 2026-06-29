@@ -17,7 +17,8 @@ subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv", 
 
 # ---- Load environment variables ----
 load_dotenv()
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+# TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 
 # ---- Logging for debugging ----
 logging.basicConfig(

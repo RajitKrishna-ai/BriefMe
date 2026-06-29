@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize Groq client
-client = Groq()
+# client = Groq()
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+
 
 
 def summarize_chat(formatted_chat: str) -> str:
