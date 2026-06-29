@@ -97,7 +97,7 @@ async def summarize_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def generate_briefing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Takes the chosen language, sends chat to Groq AI,
-    replies with text briefing AND a voice message.
+    replies with enhanced briefing (stats + urgency + senders) + voice message.
     """
     language_choice = update.message.text
 
@@ -113,7 +113,7 @@ async def generate_briefing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     language = language_map.get(language_choice, language_map.get(language_choice.lower(), "English"))
 
     await update.message.reply_text(
-        f"🤖 Generating your briefing in {language}...",
+        f"🤖 Analysing your chat in {language}...",
         reply_markup=ReplyKeyboardRemove()
     )
 
@@ -121,29 +121,43 @@ async def generate_briefing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     messages = context.user_data.get("chat_messages", [])
     formatted_chat = "\n".join(messages)
 
-    # Send to Groq AI
+    # Send to Groq AI — enhanced summary
     summary = summarize_chat_multilingual(formatted_chat, language)
 
-    # Reply with text briefing
+    # Get urgency score for emoji reaction
+    from summarizer import get_urgency_score
+    score = get_urgency_score(summary)
+
+    # Pick emoji based on urgency
+    if score >= 8:
+        urgency_emoji = "🚨 HIGH URGENCY"
+    elif score >= 5:
+        urgency_emoji = "⚠️ MEDIUM URGENCY"
+    else:
+        urgency_emoji = "✅ LOW URGENCY"
+
+    # Reply with full briefing
     await update.message.reply_text(
-        f"📋 *Your Daily Briefing in {language}:*\n\n{summary}",
+        f"📋 *BriefMe Daily Briefing*\n"
+        f"_{urgency_emoji}_\n\n"
+        f"{summary}",
         parse_mode="Markdown"
     )
 
-    # Generate voice message
+    # Generate and send voice message
     await update.message.reply_text("🎤 Generating voice message...")
 
     try:
         from tts import text_to_voice
 
-        # Convert summary to voice
+        # Convert summary to voice in chosen language
         audio_path = text_to_voice(summary, language)
 
         # Send voice message to Telegram
         with open(audio_path, "rb") as audio:
             await update.message.reply_voice(voice=audio)
 
-        # Clean up the audio file
+        # Clean up audio file after sending
         os.remove(audio_path)
 
     except Exception as e:
@@ -153,7 +167,8 @@ async def generate_briefing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["chat_messages"] = []
 
     await update.message.reply_text(
-        "✅ Done! Paste new messages anytime to start again."
+        "✅ Done! Paste new messages anytime to start again.\n"
+        "Type /start to begin a new session."
     )
     return ConversationHandler.END
 
