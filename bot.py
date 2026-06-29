@@ -1,5 +1,7 @@
 import os
 import logging
+import subprocess
+import sys
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (
@@ -11,6 +13,7 @@ from telegram.ext import (
     ContextTypes,
 )
 from summarizer import summarize_chat_multilingual
+subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv", "groq", "python-telegram-bot", "gtts"])
 
 # ---- Load environment variables ----
 load_dotenv()
