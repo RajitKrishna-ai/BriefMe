@@ -3,7 +3,7 @@ from groq import Groq
 from dotenv import load_dotenv
 
 # Load the API key from .env file
-load_dotenv()
+# load_dotenv()
 
 # Initialize Groq client
 # client = Groq()
