@@ -1,7 +1,5 @@
-python-3.11.0
 groq
 python-dotenv
 python-telegram-bot
 gtts
 pyttsx3
-streamlit
